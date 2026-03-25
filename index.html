@@ -1,10 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Stakeholder Tool</title>
+  <meta charset="UTF-8" />
+  <title>Stakeholder Session Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      margin-bottom: 24px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 24px;
+      padding: 12px;
+      background: #f4f4f4;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-  <h1>It works 🚀</h1>
+  <h1>Stakeholder Session Tool</h1>
+
+  <label for="project_name">Project Name</label>
+  <input type="text" id="project_name" />
+
+  <label for="stakeholder_name">Stakeholder Name</label>
+  <input type="text" id="stakeholder_name" />
+
+  <label for="session_date">Session Date</label>
+  <input type="date" id="session_date" />
+
+  <label for="process_overview">Process Overview</label>
+  <textarea id="process_overview"></textarea>
+
+  <label for="data_sources">Data Sources</label>
+  <textarea id="data_sources"></textarea>
+
+  <label for="data_flow">Data Flow</label>
+  <textarea id="data_flow"></textarea>
+
+  <label for="business_logic">Business Logic</label>
+  <textarea id="business_logic"></textarea>
+
+  <label for="outputs_kpis">Outputs / KPIs</label>
+  <textarea id="outputs_kpis"></textarea>
+
+  <label for="pain_points">Pain Points</label>
+  <textarea id="pain_points"></textarea>
+
+  <label for="validation_rules">Validation / Trust</label>
+  <textarea id="validation_rules"></textarea>
+
+  <label for="adoption_concerns">Adoption / Change Concerns</label>
+  <textarea id="adoption_concerns"></textarea>
+
+  <button onclick="saveSession()">Save Session</button>
+
+  <div id="result">No session submitted yet.</div>
+
+  <script>
+    const API_BASE_URL = "PEGA_AQUI_TU_API_GATEWAY_URL";
+
+    async function saveSession() {
+      const payload = {
+        project_name: document.getElementById("project_name").value,
+        stakeholder_name: document.getElementById("stakeholder_name").value,
+        session_date: document.getElementById("session_date").value,
+        process_overview: document.getElementById("process_overview").value,
+        data_sources: document.getElementById("data_sources").value,
+        data_flow: document.getElementById("data_flow").value,
+        business_logic: document.getElementById("business_logic").value,
+        outputs_kpis: document.getElementById("outputs_kpis").value,
+        pain_points: document.getElementById("pain_points").value,
+        validation_rules: document.getElementById("validation_rules").value,
+        adoption_concerns: document.getElementById("adoption_concerns").value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/sessions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById("result").innerText = "Error:\n" + error;
+      }
+    }
+  </script>
 </body>
 </html>
