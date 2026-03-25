@@ -32,11 +32,6 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
-    .section h2 {
-      margin-top: 0;
-      margin-bottom: 16px;
-    }
-
     label {
       font-weight: bold;
       display: block;
@@ -47,10 +42,10 @@
     input, textarea, select, button {
       width: 100%;
       padding: 10px;
-      box-sizing: border-box;
       font-size: 14px;
-      border: 1px solid #ccc;
       border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
     }
 
     textarea {
@@ -97,29 +92,36 @@
 
     .result-panel {
       padding: 18px;
-      background: #fbfbfc;
+      background: #f9fafb;
       border: 1px solid #ddd;
       border-radius: 8px;
-      min-height: 220px;
+      min-height: 240px;
+    }
+
+    /* NEW EXECUTIVE STYLE */
+
+    .summary-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .summary-card h3 {
+      margin-top: 0;
+      color: #111827;
+    }
+
+    .summary-content {
+      margin-top: 10px;
+      color: #374151;
       line-height: 1.6;
     }
 
-    .result-panel h2 {
-      margin-top: 18px;
-      color: #1f2937;
-    }
-
-    .result-panel h3 {
-      margin-top: 14px;
-      color: #374151;
-    }
-
-    .result-panel ul {
+    .summary-content ul {
       margin-left: 20px;
-    }
-
-    .result-panel li {
-      margin-bottom: 6px;
     }
   </style>
 </head>
@@ -127,22 +129,22 @@
 <body>
 
 <h1>Stakeholder Session Tool</h1>
-<div class="subtitle">Capture discovery sessions and generate AI summaries.</div>
+<div class="subtitle">Capture discovery sessions and generate AI architecture summaries.</div>
 
-<!-- 1. NEW SESSION -->
+<!-- 1 -->
 <div class="section">
   <h2>1. New Session</h2>
 
   <label>Project Name</label>
   <input id="project_name">
 
-  <label>Stakeholder Name</label>
+  <label>Stakeholder</label>
   <input id="stakeholder_name">
 
-  <label>Session Date</label>
+  <label>Date</label>
   <input type="date" id="session_date">
 
-  <label>Process Overview</label>
+  <label>Process</label>
   <textarea id="process_overview"></textarea>
 
   <label>Data Sources</label>
@@ -151,10 +153,10 @@
   <label>Data Flow</label>
   <textarea id="data_flow"></textarea>
 
-  <label>Business Logic</label>
+  <label>Logic</label>
   <textarea id="business_logic"></textarea>
 
-  <label>Outputs / KPIs</label>
+  <label>KPIs</label>
   <textarea id="outputs_kpis"></textarea>
 
   <label>Pain Points</label>
@@ -163,7 +165,7 @@
   <label>Validation</label>
   <textarea id="validation_rules"></textarea>
 
-  <label>Adoption Concerns</label>
+  <label>Adoption</label>
   <textarea id="adoption_concerns"></textarea>
 
   <div class="button-row single">
@@ -171,26 +173,26 @@
   </div>
 </div>
 
-<!-- 2. SAVED -->
+<!-- 2 -->
 <div class="section">
   <h2>2. Saved Sessions</h2>
 
   <button class="secondary" onclick="loadSessions()">Load Sessions</button>
 
-  <label>Choose Session</label>
+  <label>Select Session</label>
   <select id="session_select" onchange="handleSessionChange()">
-    <option value="">Select</option>
+    <option>Select</option>
   </select>
 
   <div class="button-row">
-    <button onclick="viewStoredSummary()">View Stored</button>
+    <button onclick="viewStoredSummary()">View</button>
     <button class="primary" onclick="generateSummary()">Generate</button>
   </div>
 </div>
 
-<!-- 3. DETAILS -->
+<!-- 3 -->
 <div class="section">
-  <h2>3. Selected Session</h2>
+  <h2>3. Session Details</h2>
   <div class="details-grid">
     <div class="detail-card"><b>Project</b><br><span id="d_project">-</span></div>
     <div class="detail-card"><b>Stakeholder</b><br><span id="d_stakeholder">-</span></div>
@@ -200,7 +202,7 @@
   </div>
 </div>
 
-<!-- 4 OUTPUT -->
+<!-- 4 -->
 <div class="section">
   <h2>4. AI Output</h2>
   <div id="result" class="result-panel">Ready</div>
@@ -211,17 +213,31 @@
 const API = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
 let sessionsCache = [];
 
-/* FORMAT SUMMARY */
+/* FORMAT TO EXECUTIVE CARDS */
 function formatSummary(text) {
-  if (!text) return "No summary available.";
+  if (!text) return "<p>No summary available.</p>";
 
-  let html = text;
+  const sections = text.split(/\n## /);
 
-  html = html.replace(/^# (.*$)/gim, '<h2>$1</h2>');
-  html = html.replace(/^## (.*$)/gim, '<h3>$1</h3>');
-  html = html.replace(/^- (.*$)/gim, '<li>$1</li>');
-  html = html.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
-  html = html.replace(/\n/g, '<br>');
+  let html = "";
+
+  sections.forEach(section => {
+    let lines = section.split("\n");
+    let title = lines[0].replace("# ", "");
+    let content = lines.slice(1).join("\n");
+
+    content = content.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+    content = content.replace(/^- (.*)/gim, "<li>$1</li>");
+    content = content.replace(/(<li>.*<\/li>)/gim, "<ul>$1</ul>");
+    content = content.replace(/\n/g, "<br>");
+
+    html += `
+      <div class="summary-card">
+        <h3>${title}</h3>
+        <div class="summary-content">${content}</div>
+      </div>
+    `;
+  });
 
   return html;
 }
@@ -242,9 +258,9 @@ async function saveSession() {
     adoption_concerns: adoption_concerns.value
   };
 
-  const res = await fetch(API + "/sessions", {
+  await fetch(API + "/sessions", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify(payload)
   });
 
@@ -259,14 +275,13 @@ async function loadSessions() {
 
   sessionsCache = data.items || [];
 
-  const select = document.getElementById("session_select");
-  select.innerHTML = '<option>Select</option>';
+  session_select.innerHTML = "<option>Select</option>";
 
   sessionsCache.forEach(s => {
-    const o = document.createElement("option");
+    let o = document.createElement("option");
     o.value = s.session_id;
-    o.textContent = `${s.project_name || "No Project"} | ${s.session_id}`;
-    select.appendChild(o);
+    o.textContent = `${s.project_name} | ${s.session_id}`;
+    session_select.appendChild(o);
   });
 
   result.innerText = "Sessions loaded ✔️";
@@ -274,15 +289,13 @@ async function loadSessions() {
 
 /* SELECT */
 function handleSessionChange() {
-  const id = session_select.value;
-  const s = sessionsCache.find(x => x.session_id === id);
-
+  const s = sessionsCache.find(x => x.session_id === session_select.value);
   if (!s) return;
 
-  d_project.innerText = s.project_name || "-";
-  d_stakeholder.innerText = s.stakeholder_name || "-";
-  d_date.innerText = s.session_date || "-";
-  d_status.innerText = s.status || "-";
+  d_project.innerText = s.project_name;
+  d_stakeholder.innerText = s.stakeholder_name;
+  d_date.innerText = s.session_date;
+  d_status.innerText = s.status;
   d_id.innerText = s.session_id;
 }
 
@@ -304,8 +317,8 @@ async function generateSummary() {
 
   const res = await fetch(API + "/generate-summary", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ session_id: id })
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({session_id: id})
   });
 
   const data = await res.json();
