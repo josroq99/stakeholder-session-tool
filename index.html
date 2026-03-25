@@ -101,6 +101,48 @@
       color: #666;
       margin-top: 6px;
     }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .detail-card {
+      background: #f8fafc;
+      border: 1px solid #dbe3ea;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    
+    .detail-card.full {
+      grid-column: 1 / -1;
+    }
+    
+    .result-panel {
+      margin-top: 8px;
+      padding: 18px;
+      background: #fbfbfc;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      min-height: 220px;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+    
+    .result-panel h1,
+    .result-panel h2,
+    .result-panel h3 {
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+    
+    .result-panel hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 16px 0;
+    }
   </style>
 </head>
 <body>
@@ -147,7 +189,7 @@
       <button class="primary" type="button" onclick="saveSession()">Save Session</button>
     </div>
   </div>
-
+  
   <div class="section">
     <h2>2. Saved Sessions</h2>
 
@@ -156,7 +198,7 @@
     </div>
 
     <label for="session_select">Choose a Saved Session</label>
-    <select id="session_select">
+    <select id="session_select" onchange="handleSessionChange()">
       <option value="">Select a session</option>
     </select>
     <div class="helper">Load sessions first, then choose one to view or summarize.</div>
@@ -168,13 +210,59 @@
   </div>
 
   <div class="section">
-    <h2>3. Output</h2>
-    <div id="result">No session submitted yet.</div>
+    <h2>3. Selected Session</h2>
+    <div id="session_details" class="details-grid">
+      <div class="detail-card"><strong>Project:</strong><br><span id="detail_project">-</span></div>
+      <div class="detail-card"><strong>Stakeholder:</strong><br><span id="detail_stakeholder">-</span></div>
+      <div class="detail-card"><strong>Date:</strong><br><span id="detail_date">-</span></div>
+      <div class="detail-card"><strong>Status:</strong><br><span id="detail_status">-</span></div>
+      <div class="detail-card full"><strong>Session ID:</strong><br><span id="detail_id">-</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>4. AI Output</h2>
+    <div id="result" class="result-panel">No session submitted yet.</div>
   </div>
 
   <script>
     const API_BASE_URL = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
     let sessionsCache = [];
+
+    function renderSelectedSessionDetails(session) {
+      document.getElementById("detail_project").innerText =
+        session.project_name || "-";
+    
+      document.getElementById("detail_stakeholder").innerText =
+        session.stakeholder_name || "-";
+    
+      document.getElementById("detail_date").innerText =
+        session.session_date || "-";
+    
+      document.getElementById("detail_status").innerText =
+        session.status || "-";
+    
+      document.getElementById("detail_id").innerText =
+        session.session_id || "-";
+    }
+
+    function handleSessionChange() {
+      const sessionId = document.getElementById("session_select").value;
+      const selected = sessionsCache.find(s => s.session_id === sessionId);
+    
+      if (!selected) {
+        renderSelectedSessionDetails({
+          project_name: "-",
+          stakeholder_name: "-",
+          session_date: "-",
+          status: "-",
+          session_id: "-"
+        });
+        return;
+      }
+    
+      renderSelectedSessionDetails(selected);
+    }
 
     async function saveSession() {
       const payload = {
@@ -209,44 +297,47 @@
       }
     }
 
+    let sessionsCache = [];
+
     async function loadSessions() {
       try {
         document.getElementById("result").innerText = "Loading sessions...";
-
+    
         const response = await fetch(`${API_BASE_URL}/sessions`);
         const result = await response.json();
-
+    
         sessionsCache = result.items || [];
-
+    
         const select = document.getElementById("session_select");
         select.innerHTML = '<option value="">Select a session</option>';
-
+    
         sessionsCache.forEach(session => {
           const option = document.createElement("option");
           option.value = session.session_id;
-          option.textContent = `${session.project_name || "No Project"} | ${session.stakeholder_name || "No Stakeholder"} | ${session.session_id}`;
+          option.textContent =
+            `${session.project_name || "No Project"} | ${session.stakeholder_name || "No Stakeholder"} | ${session.session_id}`;
           select.appendChild(option);
         });
-
+    
         document.getElementById("result").innerText =
-          JSON.stringify(result, null, 2);
+          `Loaded ${sessionsCache.length} session(s). Select one to continue.`;
       } catch (error) {
         document.getElementById("result").innerText =
           "Error:\n" + error;
       }
     }
-
+    
     async function generateSummary() {
       const sessionId = document.getElementById("session_select").value;
-
+    
       if (!sessionId) {
         alert("Please select a session first");
         return;
       }
-
+    
       try {
         document.getElementById("result").innerText = "Generating summary...";
-
+    
         const response = await fetch(`${API_BASE_URL}/generate-summary`, {
           method: "POST",
           headers: {
@@ -256,11 +347,17 @@
             session_id: sessionId
           })
         });
-
+    
         const result = await response.json();
-
+    
         document.getElementById("result").innerText =
           result.summary || JSON.stringify(result, null, 2);
+    
+        const selected = sessionsCache.find(s => s.session_id === sessionId);
+        if (selected) {
+          selected.status = "GENERATED";
+          renderSelectedSessionDetails(selected);
+        }
       } catch (error) {
         document.getElementById("result").innerText =
           "Error:\n" + error;
@@ -269,18 +366,20 @@
 
     async function viewStoredSummary() {
       const sessionId = document.getElementById("session_select").value;
-
+    
       if (!sessionId) {
         alert("Please select a session first");
         return;
       }
-
+    
       try {
         document.getElementById("result").innerText = "Loading stored summary...";
-
+    
         const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`);
         const result = await response.json();
-
+    
+        renderSelectedSessionDetails(result);
+    
         document.getElementById("result").innerText =
           result.ai_deliverable || "No stored summary found for this session.";
       } catch (error) {
