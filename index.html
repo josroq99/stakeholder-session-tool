@@ -84,48 +84,51 @@
   <div id="result">No session submitted yet.</div>
 
   <script>
-    const API_BASE_URL = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
+  const API_BASE_URL = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
 
-    async function saveSession() {
-      const payload = {
-        project_name: document.getElementById("project_name").value,
-        stakeholder_name: document.getElementById("stakeholder_name").value,
-        session_date: document.getElementById("session_date").value,
-        process_overview: document.getElementById("process_overview").value,
-        data_sources: document.getElementById("data_sources").value,
-        data_flow: document.getElementById("data_flow").value,
-        business_logic: document.getElementById("business_logic").value,
-        outputs_kpis: document.getElementById("outputs_kpis").value,
-        pain_points: document.getElementById("pain_points").value,
-        validation_rules: document.getElementById("validation_rules").value,
-        adoption_concerns: document.getElementById("adoption_concerns").value
-      };
+  async function saveSession() {
+    const payload = {
+      project_name: document.getElementById("project_name").value,
+      stakeholder_name: document.getElementById("stakeholder_name").value,
+      session_date: document.getElementById("session_date").value,
+      process_overview: document.getElementById("process_overview").value,
+      data_sources: document.getElementById("data_sources").value,
+      data_flow: document.getElementById("data_flow").value,
+      business_logic: document.getElementById("business_logic").value,
+      outputs_kpis: document.getElementById("outputs_kpis").value,
+      pain_points: document.getElementById("pain_points").value,
+      validation_rules: document.getElementById("validation_rules").value,
+      adoption_concerns: document.getElementById("adoption_concerns").value
+    };
 
-      async function loadSessions() {
-        try {
-          const response = await fetch(`${API_BASE_URL}/sessions`);
-          const result = await response.json();
-          document.getElementById("result").innerText = JSON.stringify(result, null, 2);
-        } catch (error) {
-          document.getElementById("result").innerText = "Error:\n" + error;
-        }
-      }
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/sessions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        document.getElementById("result").innerText = JSON.stringify(result, null, 2);
-      } catch (error) {
-        document.getElementById("result").innerText = "Error:\n" + error;
-      }
+      const result = await response.json();
+      document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+    } catch (error) {
+      document.getElementById("result").innerText = "Error:\n" + error;
     }
-  </script>
+  }
+
+  async function loadSessions() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions`, {
+        method: "GET"
+      });
+
+      const result = await response.json();
+      document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+    } catch (error) {
+      document.getElementById("result").innerText = "Error:\n" + error;
+    }
+  }
+</script>
 </body>
 </html>
