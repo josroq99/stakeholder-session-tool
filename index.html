@@ -6,202 +6,288 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 900px;
+      max-width: 1000px;
       margin: 40px auto;
       padding: 0 20px;
+      background: #f8f9fb;
+      color: #222;
     }
+
     h1 {
-      margin-bottom: 24px;
+      margin-bottom: 8px;
     }
+
+    .subtitle {
+      margin-bottom: 28px;
+      color: #666;
+    }
+
+    .section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .section h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+
     label {
       font-weight: bold;
       display: block;
-      margin-top: 16px;
+      margin-top: 14px;
       margin-bottom: 6px;
     }
-    input, textarea, button {
+
+    input, textarea, select, button {
       width: 100%;
       padding: 10px;
       box-sizing: border-box;
       font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
+
     textarea {
-      min-height: 100px;
+      min-height: 90px;
       resize: vertical;
     }
-    button {
-      margin-top: 20px;
-      cursor: pointer;
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
     }
+
+    .button-row.single {
+      grid-template-columns: 1fr;
+    }
+
+    button {
+      cursor: pointer;
+      background: #f3f4f6;
+    }
+
+    button.primary {
+      background: #1f6feb;
+      color: white;
+      border: none;
+    }
+
+    button.secondary {
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+    }
+
     #result {
-      margin-top: 24px;
-      padding: 12px;
+      margin-top: 8px;
+      padding: 16px;
       background: #f4f4f4;
       border: 1px solid #ddd;
+      border-radius: 8px;
       white-space: pre-wrap;
+      min-height: 160px;
+      overflow-x: auto;
+    }
+
+    .helper {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
     }
   </style>
 </head>
 <body>
   <h1>Stakeholder Session Tool</h1>
+  <div class="subtitle">Capture discovery sessions, manage saved sessions, and generate AI summaries.</div>
 
-  <label for="project_name">Project Name</label>
-  <input type="text" id="project_name" />
+  <div class="section">
+    <h2>1. New Session</h2>
 
-  <label for="stakeholder_name">Stakeholder Name</label>
-  <input type="text" id="stakeholder_name" />
+    <label for="project_name">Project Name</label>
+    <input type="text" id="project_name" />
 
-  <label for="session_date">Session Date</label>
-  <input type="date" id="session_date" />
+    <label for="stakeholder_name">Stakeholder Name</label>
+    <input type="text" id="stakeholder_name" />
 
-  <label for="process_overview">Process Overview</label>
-  <textarea id="process_overview"></textarea>
+    <label for="session_date">Session Date</label>
+    <input type="date" id="session_date" />
 
-  <label for="data_sources">Data Sources</label>
-  <textarea id="data_sources"></textarea>
+    <label for="process_overview">Process Overview</label>
+    <textarea id="process_overview"></textarea>
 
-  <label for="data_flow">Data Flow</label>
-  <textarea id="data_flow"></textarea>
+    <label for="data_sources">Data Sources</label>
+    <textarea id="data_sources"></textarea>
 
-  <label for="business_logic">Business Logic</label>
-  <textarea id="business_logic"></textarea>
+    <label for="data_flow">Data Flow</label>
+    <textarea id="data_flow"></textarea>
 
-  <label for="outputs_kpis">Outputs / KPIs</label>
-  <textarea id="outputs_kpis"></textarea>
+    <label for="business_logic">Business Logic</label>
+    <textarea id="business_logic"></textarea>
 
-  <label for="pain_points">Pain Points</label>
-  <textarea id="pain_points"></textarea>
+    <label for="outputs_kpis">Outputs / KPIs</label>
+    <textarea id="outputs_kpis"></textarea>
 
-  <label for="validation_rules">Validation / Trust</label>
-  <textarea id="validation_rules"></textarea>
+    <label for="pain_points">Pain Points</label>
+    <textarea id="pain_points"></textarea>
 
-  <label for="adoption_concerns">Adoption / Change Concerns</label>
-  <textarea id="adoption_concerns"></textarea>
+    <label for="validation_rules">Validation / Trust</label>
+    <textarea id="validation_rules"></textarea>
 
-  <label for="session_select">Saved Sessions</label>
-  <select id="session_select">
-    <option value="">Select a session</option>
-  </select>
-  
-  <button type="button" onclick="saveSession()">Save Session</button>
-  <button type="button" onclick="loadSessions()">Load Sessions</button>
-  <button type="button" onclick="generateSummary()">Generate Summary</button>
-  <button type="button" onclick="viewStoredSummary()">View Stored Summary</button>
+    <label for="adoption_concerns">Adoption / Change Concerns</label>
+    <textarea id="adoption_concerns"></textarea>
 
-  <div id="result">No session submitted yet.</div>
+    <div class="button-row single">
+      <button class="primary" type="button" onclick="saveSession()">Save Session</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>2. Saved Sessions</h2>
+
+    <div class="button-row single">
+      <button class="secondary" type="button" onclick="loadSessions()">Load Sessions</button>
+    </div>
+
+    <label for="session_select">Choose a Saved Session</label>
+    <select id="session_select">
+      <option value="">Select a session</option>
+    </select>
+    <div class="helper">Load sessions first, then choose one to view or summarize.</div>
+
+    <div class="button-row">
+      <button type="button" onclick="viewStoredSummary()">View Stored Summary</button>
+      <button class="primary" type="button" onclick="generateSummary()">Generate Summary</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>3. Output</h2>
+    <div id="result">No session submitted yet.</div>
+  </div>
 
   <script>
-  const API_BASE_URL = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
+    const API_BASE_URL = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
+    let sessionsCache = [];
 
-  async function saveSession() {
-    const payload = {
-      project_name: document.getElementById("project_name").value,
-      stakeholder_name: document.getElementById("stakeholder_name").value,
-      session_date: document.getElementById("session_date").value,
-      process_overview: document.getElementById("process_overview").value,
-      data_sources: document.getElementById("data_sources").value,
-      data_flow: document.getElementById("data_flow").value,
-      business_logic: document.getElementById("business_logic").value,
-      outputs_kpis: document.getElementById("outputs_kpis").value,
-      pain_points: document.getElementById("pain_points").value,
-      validation_rules: document.getElementById("validation_rules").value,
-      adoption_concerns: document.getElementById("adoption_concerns").value
-    };
+    async function saveSession() {
+      const payload = {
+        project_name: document.getElementById("project_name").value,
+        stakeholder_name: document.getElementById("stakeholder_name").value,
+        session_date: document.getElementById("session_date").value,
+        process_overview: document.getElementById("process_overview").value,
+        data_sources: document.getElementById("data_sources").value,
+        data_flow: document.getElementById("data_flow").value,
+        business_logic: document.getElementById("business_logic").value,
+        outputs_kpis: document.getElementById("outputs_kpis").value,
+        pain_points: document.getElementById("pain_points").value,
+        validation_rules: document.getElementById("validation_rules").value,
+        adoption_concerns: document.getElementById("adoption_concerns").value
+      };
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/sessions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
+      try {
+        document.getElementById("result").innerText = "Saving session...";
 
-      const result = await response.json();
-      document.getElementById("result").innerText = JSON.stringify(result, null, 2);
-    } catch (error) {
-      document.getElementById("result").innerText = "Error:\n" + error;
+        const response = await fetch(`${API_BASE_URL}/sessions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById("result").innerText = "Error:\n" + error;
+      }
     }
-  }
 
-  let sessionsCache = [];
+    async function loadSessions() {
+      try {
+        document.getElementById("result").innerText = "Loading sessions...";
 
-  async function loadSessions() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sessions`);
-      const result = await response.json();
-  
-      sessionsCache = result.items || [];
-  
-      const select = document.getElementById("session_select");
-      select.innerHTML = '<option value="">Select a session</option>';
-  
-      sessionsCache.forEach(session => {
-        const option = document.createElement("option");
-        option.value = session.session_id;
-        option.textContent = `${session.project_name || "No Project"} | ${session.session_id}`;
-        select.appendChild(option);
-      });
-  
-      document.getElementById("result").innerText =
-        JSON.stringify(result, null, 2);
-    } catch (error) {
-      document.getElementById("result").innerText =
-        "Error:\n" + error;
+        const response = await fetch(`${API_BASE_URL}/sessions`);
+        const result = await response.json();
+
+        sessionsCache = result.items || [];
+
+        const select = document.getElementById("session_select");
+        select.innerHTML = '<option value="">Select a session</option>';
+
+        sessionsCache.forEach(session => {
+          const option = document.createElement("option");
+          option.value = session.session_id;
+          option.textContent = `${session.project_name || "No Project"} | ${session.stakeholder_name || "No Stakeholder"} | ${session.session_id}`;
+          select.appendChild(option);
+        });
+
+        document.getElementById("result").innerText =
+          JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById("result").innerText =
+          "Error:\n" + error;
+      }
     }
-  }
 
-  async function generateSummary() {
-  const sessionId = document.getElementById("session_select").value;
+    async function generateSummary() {
+      const sessionId = document.getElementById("session_select").value;
 
-  if (!sessionId) {
-    alert("Please select a session first");
-    return;
-  }
+      if (!sessionId) {
+        alert("Please select a session first");
+        return;
+      }
 
-  try {
-    document.getElementById("result").innerText = "Generating summary...";
+      try {
+        document.getElementById("result").innerText = "Generating summary...";
 
-    const response = await fetch(`${API_BASE_URL}/generate-summary`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        session_id: sessionId
-      })
-    });
+        const response = await fetch(`${API_BASE_URL}/generate-summary`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            session_id: sessionId
+          })
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    document.getElementById("result").innerText =
-      result.summary || JSON.stringify(result, null, 2);
+        document.getElementById("result").innerText =
+          result.summary || JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById("result").innerText =
+          "Error:\n" + error;
+      }
+    }
 
-  } catch (error) {
-    document.getElementById("result").innerText =
-      "Error:\n" + error;
-  }
-}
+    async function viewStoredSummary() {
+      const sessionId = document.getElementById("session_select").value;
 
-async function viewStoredSummary() {
-  const sessionId = document.getElementById("session_select").value;
+      if (!sessionId) {
+        alert("Please select a session first");
+        return;
+      }
 
-  if (!sessionId) {
-    alert("Please select a session first");
-    return;
-  }
+      try {
+        document.getElementById("result").innerText = "Loading stored summary...";
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`);
-    const result = await response.json();
+        const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`);
+        const result = await response.json();
 
-    document.getElementById("result").innerText =
-      result.ai_deliverable || "No stored summary found for this session.";
-  } catch (error) {
-    document.getElementById("result").innerText =
-      "Error:\n" + error;
-  }
-}
-</script>
+        document.getElementById("result").innerText =
+          result.ai_deliverable || "No stored summary found for this session.";
+      } catch (error) {
+        document.getElementById("result").innerText =
+          "Error:\n" + error;
+      }
+    }
+  </script>
 </body>
 </html>
