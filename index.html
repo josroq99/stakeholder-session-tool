@@ -80,6 +80,7 @@
 
   <button type="button" onclick="saveSession()">Save Session</button>
   <button type="button" onclick="loadSessions()">Load Sessions</button>
+  <button type="button" onclick="generateSummary()">Generate Summary</button>
 
   <div id="result">No session submitted yet.</div>
 
@@ -117,18 +118,54 @@
     }
   }
 
+  let sessionsCache = [];
+
   async function loadSessions() {
     try {
-      const response = await fetch(`${API_BASE_URL}/sessions`, {
-        method: "GET"
-      });
-
+      const response = await fetch(`${API_BASE_URL}/sessions`);
       const result = await response.json();
-      document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+  
+      sessionsCache = result.items || [];
+  
+      document.getElementById("result").innerText =
+        JSON.stringify(result, null, 2);
     } catch (error) {
-      document.getElementById("result").innerText = "Error:\n" + error;
+      document.getElementById("result").innerText =
+        "Error:\n" + error;
     }
   }
+
+  async function generateSummary() {
+  if (sessionsCache.length === 0) {
+    alert("Load sessions first");
+    return;
+  }
+
+  const sessionId = sessionsCache[0].session_id; // usamos el primero por ahora
+
+  try {
+    document.getElementById("result").innerText = "Generating summary...";
+
+    const response = await fetch(`${API_BASE_URL}/generate-summary`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        session_id: sessionId
+      })
+    });
+
+    const result = await response.json();
+
+    document.getElementById("result").innerText =
+      result.summary || JSON.stringify(result, null, 2);
+
+  } catch (error) {
+    document.getElementById("result").innerText =
+      "Error:\n" + error;
+  }
+}
 </script>
 </body>
 </html>
