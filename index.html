@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 40px auto;
       padding: 0 20px;
       background: #f8f9fb;
@@ -32,6 +32,11 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
+    .section h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
     label {
       font-weight: bold;
       display: block;
@@ -50,6 +55,7 @@
 
     textarea {
       min-height: 90px;
+      resize: vertical;
     }
 
     .button-row {
@@ -63,6 +69,15 @@
       grid-template-columns: 1fr;
     }
 
+    .button-row.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    button {
+      cursor: pointer;
+      background: #f3f4f6;
+    }
+
     button.primary {
       background: #1f6feb;
       color: white;
@@ -71,6 +86,13 @@
 
     button.secondary {
       background: #eef2ff;
+      border: 1px solid #c7d2fe;
+    }
+
+    button.success {
+      background: #0f9d58;
+      color: white;
+      border: none;
     }
 
     .details-grid {
@@ -95,238 +117,526 @@
       background: #f9fafb;
       border: 1px solid #ddd;
       border-radius: 8px;
-      min-height: 240px;
+      min-height: 260px;
+      overflow-x: auto;
     }
 
-    /* NEW EXECUTIVE STYLE */
-
-    .summary-card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    .helper {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
     }
 
-    .summary-card h3 {
+    .report-container {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #1f2937;
+    }
+
+    .report-container h1 {
+      font-size: 24px;
       margin-top: 0;
+      margin-bottom: 10px;
       color: #111827;
     }
 
-    .summary-content {
-      margin-top: 10px;
-      color: #374151;
-      line-height: 1.6;
+    .report-container h2 {
+      margin-top: 22px;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 6px;
+      color: #111827;
+      font-size: 20px;
     }
 
-    .summary-content ul {
-      margin-left: 20px;
+    .report-container h3 {
+      margin-top: 16px;
+      margin-bottom: 8px;
+      color: #1f2937;
+      font-size: 17px;
+    }
+
+    .report-container h4 {
+      margin-top: 12px;
+      margin-bottom: 8px;
+      color: #374151;
+      font-size: 15px;
+    }
+
+    .report-container p {
+      margin: 10px 0;
+    }
+
+    .report-container ul {
+      margin: 10px 0 10px 20px;
+      padding-left: 14px;
+    }
+
+    .report-container li {
+      margin-bottom: 6px;
+    }
+
+    .report-container table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .report-container th {
+      background: #f3f4f6;
+      text-align: left;
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .report-container td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      vertical-align: top;
+    }
+
+    .report-container hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 18px 0;
+    }
+
+    @media (max-width: 768px) {
+      .button-row,
+      .button-row.three,
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
+  <h1>Stakeholder Session Tool</h1>
+  <div class="subtitle">Capture discovery sessions, manage saved sessions, and generate AI architecture summaries.</div>
 
-<h1>Stakeholder Session Tool</h1>
-<div class="subtitle">Capture discovery sessions and generate AI architecture summaries.</div>
+  <!-- 1. NEW SESSION -->
+  <div class="section">
+    <h2>1. New Session</h2>
 
-<!-- 1 -->
-<div class="section">
-  <h2>1. New Session</h2>
+    <label for="project_name">Project Name</label>
+    <input id="project_name" />
 
-  <label>Project Name</label>
-  <input id="project_name">
+    <label for="stakeholder_name">Stakeholder Name</label>
+    <input id="stakeholder_name" />
 
-  <label>Stakeholder</label>
-  <input id="stakeholder_name">
+    <label for="session_date">Session Date</label>
+    <input type="date" id="session_date" />
 
-  <label>Date</label>
-  <input type="date" id="session_date">
+    <label for="process_overview">Process Overview</label>
+    <textarea id="process_overview"></textarea>
 
-  <label>Process</label>
-  <textarea id="process_overview"></textarea>
+    <label for="data_sources">Data Sources</label>
+    <textarea id="data_sources"></textarea>
 
-  <label>Data Sources</label>
-  <textarea id="data_sources"></textarea>
+    <label for="data_flow">Data Flow</label>
+    <textarea id="data_flow"></textarea>
 
-  <label>Data Flow</label>
-  <textarea id="data_flow"></textarea>
+    <label for="business_logic">Business Logic</label>
+    <textarea id="business_logic"></textarea>
 
-  <label>Logic</label>
-  <textarea id="business_logic"></textarea>
+    <label for="outputs_kpis">Outputs / KPIs</label>
+    <textarea id="outputs_kpis"></textarea>
 
-  <label>KPIs</label>
-  <textarea id="outputs_kpis"></textarea>
+    <label for="pain_points">Pain Points</label>
+    <textarea id="pain_points"></textarea>
 
-  <label>Pain Points</label>
-  <textarea id="pain_points"></textarea>
+    <label for="validation_rules">Validation / Trust</label>
+    <textarea id="validation_rules"></textarea>
 
-  <label>Validation</label>
-  <textarea id="validation_rules"></textarea>
+    <label for="adoption_concerns">Adoption / Change Concerns</label>
+    <textarea id="adoption_concerns"></textarea>
 
-  <label>Adoption</label>
-  <textarea id="adoption_concerns"></textarea>
-
-  <div class="button-row single">
-    <button class="primary" onclick="saveSession()">Save Session</button>
+    <div class="button-row single">
+      <button class="primary" type="button" onclick="saveSession()">Save Session</button>
+    </div>
   </div>
-</div>
 
-<!-- 2 -->
-<div class="section">
-  <h2>2. Saved Sessions</h2>
+  <!-- 2. SAVED SESSIONS -->
+  <div class="section">
+    <h2>2. Saved Sessions</h2>
 
-  <button class="secondary" onclick="loadSessions()">Load Sessions</button>
+    <div class="button-row single">
+      <button class="secondary" type="button" onclick="loadSessions()">Load Sessions</button>
+    </div>
 
-  <label>Select Session</label>
-  <select id="session_select" onchange="handleSessionChange()">
-    <option>Select</option>
-  </select>
+    <label for="session_select">Choose a Saved Session</label>
+    <select id="session_select" onchange="handleSessionChange()">
+      <option value="">Select a session</option>
+    </select>
+    <div class="helper">Load sessions first, then choose one to view or summarize.</div>
 
-  <div class="button-row">
-    <button onclick="viewStoredSummary()">View</button>
-    <button class="primary" onclick="generateSummary()">Generate</button>
+    <div class="button-row three">
+      <button type="button" onclick="viewStoredSummary()">View Stored Summary</button>
+      <button class="primary" type="button" onclick="generateSummary()">Generate Summary</button>
+      <button class="success" type="button" onclick="downloadPdf()">Download PDF</button>
+    </div>
   </div>
-</div>
 
-<!-- 3 -->
-<div class="section">
-  <h2>3. Session Details</h2>
-  <div class="details-grid">
-    <div class="detail-card"><b>Project</b><br><span id="d_project">-</span></div>
-    <div class="detail-card"><b>Stakeholder</b><br><span id="d_stakeholder">-</span></div>
-    <div class="detail-card"><b>Date</b><br><span id="d_date">-</span></div>
-    <div class="detail-card"><b>Status</b><br><span id="d_status">-</span></div>
-    <div class="detail-card full"><b>ID</b><br><span id="d_id">-</span></div>
+  <!-- 3. SESSION DETAILS -->
+  <div class="section">
+    <h2>3. Selected Session</h2>
+    <div class="details-grid">
+      <div class="detail-card"><b>Project</b><br><span id="d_project">-</span></div>
+      <div class="detail-card"><b>Stakeholder</b><br><span id="d_stakeholder">-</span></div>
+      <div class="detail-card"><b>Date</b><br><span id="d_date">-</span></div>
+      <div class="detail-card"><b>Status</b><br><span id="d_status">-</span></div>
+      <div class="detail-card full"><b>Session ID</b><br><span id="d_id">-</span></div>
+    </div>
   </div>
-</div>
 
-<!-- 4 -->
-<div class="section">
-  <h2>4. AI Output</h2>
-  <div id="result" class="result-panel">Ready</div>
-</div>
+  <!-- 4. OUTPUT -->
+  <div class="section">
+    <h2>4. AI Output</h2>
+    <div id="result" class="result-panel">Ready</div>
+  </div>
 
-<script>
+  <script>
+    const API = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
+    let sessionsCache = [];
 
-const API = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
-let sessionsCache = [];
+    function resetSelectedSessionDetails() {
+      document.getElementById("d_project").innerText = "-";
+      document.getElementById("d_stakeholder").innerText = "-";
+      document.getElementById("d_date").innerText = "-";
+      document.getElementById("d_status").innerText = "-";
+      document.getElementById("d_id").innerText = "-";
+    }
 
-/* FORMAT TO EXECUTIVE CARDS */
-function formatSummary(text) {
-  if (!text) return "<p>No summary available.</p>";
+    function renderSelectedSessionDetails(session) {
+      document.getElementById("d_project").innerText = session.project_name || "-";
+      document.getElementById("d_stakeholder").innerText = session.stakeholder_name || "-";
+      document.getElementById("d_date").innerText = session.session_date || "-";
+      document.getElementById("d_status").innerText = session.status || "-";
+      document.getElementById("d_id").innerText = session.session_id || "-";
+    }
 
-  const sections = text.split(/\n## /);
+    function handleSessionChange() {
+      const selectedId = document.getElementById("session_select").value;
+      const selected = sessionsCache.find(s => s.session_id === selectedId);
 
-  let html = "";
+      if (!selected) {
+        resetSelectedSessionDetails();
+        return;
+      }
 
-  sections.forEach(section => {
-    let lines = section.split("\n");
-    let title = lines[0].replace("# ", "");
-    let content = lines.slice(1).join("\n");
+      renderSelectedSessionDetails(selected);
+    }
 
-    content = content.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-    content = content.replace(/^- (.*)/gim, "<li>$1</li>");
-    content = content.replace(/(<li>.*<\/li>)/gim, "<ul>$1</ul>");
-    content = content.replace(/\n/g, "<br>");
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
 
-    html += `
-      <div class="summary-card">
-        <h3>${title}</h3>
-        <div class="summary-content">${content}</div>
-      </div>
-    `;
-  });
+    function formatSummary(text) {
+      if (!text) return "<p>No summary available.</p>";
 
-  return html;
-}
+      let html = escapeHtml(text);
 
-/* SAVE */
-async function saveSession() {
-  const payload = {
-    project_name: project_name.value,
-    stakeholder_name: stakeholder_name.value,
-    session_date: session_date.value,
-    process_overview: process_overview.value,
-    data_sources: data_sources.value,
-    data_flow: data_flow.value,
-    business_logic: business_logic.value,
-    outputs_kpis: outputs_kpis.value,
-    pain_points: pain_points.value,
-    validation_rules: validation_rules.value,
-    adoption_concerns: adoption_concerns.value
-  };
+      html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
+      html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
 
-  await fetch(API + "/sessions", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  });
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-  result.innerText = "Saved ✔️";
-  loadSessions();
-}
+      // Parse simple markdown tables
+      const lines = html.split('\n');
+      let inTable = false;
+      let tableRows = [];
+      let rebuilt = [];
 
-/* LOAD */
-async function loadSessions() {
-  const res = await fetch(API + "/sessions");
-  const data = await res.json();
+      function flushTable() {
+        if (tableRows.length === 0) return;
 
-  sessionsCache = data.items || [];
+        let tableHtml = "<table>";
+        tableRows.forEach((row, idx) => {
+          const cells = row.split("|").map(c => c.trim()).filter(c => c !== "");
+          if (cells.length === 0) return;
 
-  session_select.innerHTML = "<option>Select</option>";
+          // skip markdown separator rows like |---|---|
+          const isSeparator = cells.every(c => /^:?-{3,}:?$/.test(c));
+          if (isSeparator) return;
 
-  sessionsCache.forEach(s => {
-    let o = document.createElement("option");
-    o.value = s.session_id;
-    o.textContent = `${s.project_name} | ${s.session_id}`;
-    session_select.appendChild(o);
-  });
+          tableHtml += "<tr>";
+          cells.forEach(cell => {
+            tableHtml += idx === 0 ? `<th>${cell}</th>` : `<td>${cell}</td>`;
+          });
+          tableHtml += "</tr>";
+        });
+        tableHtml += "</table>";
+        rebuilt.push(tableHtml);
+        tableRows = [];
+      }
 
-  result.innerText = "Sessions loaded ✔️";
-}
+      for (const line of lines) {
+        if (line.includes("|")) {
+          tableRows.push(line);
+          inTable = true;
+        } else {
+          if (inTable) {
+            flushTable();
+            inTable = false;
+          }
+          rebuilt.push(line);
+        }
+      }
 
-/* SELECT */
-function handleSessionChange() {
-  const s = sessionsCache.find(x => x.session_id === session_select.value);
-  if (!s) return;
+      if (inTable) flushTable();
 
-  d_project.innerText = s.project_name;
-  d_stakeholder.innerText = s.stakeholder_name;
-  d_date.innerText = s.session_date;
-  d_status.innerText = s.status;
-  d_id.innerText = s.session_id;
-}
+      html = rebuilt.join("\n");
 
-/* VIEW */
-async function viewStoredSummary() {
-  const id = session_select.value;
+      // Bullets
+      html = html.replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>');
+      html = html.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
 
-  const res = await fetch(API + "/sessions/" + id);
-  const data = await res.json();
+      // Horizontal rules
+      html = html.replace(/^---$/gim, '<hr>');
 
-  result.innerHTML = formatSummary(data.ai_deliverable);
-}
+      // Paragraph spacing
+      html = html.replace(/\n\n+/g, '</p><p>');
+      html = '<p>' + html + '</p>';
 
-/* GENERATE */
-async function generateSummary() {
-  const id = session_select.value;
+      // Cleanup around block elements
+      html = html.replace(/<p>(\s*<(h1|h2|h3|h4|ul|table|hr))/g, '$1');
+      html = html.replace(/(<\/(h1|h2|h3|h4|ul|table|hr)>)\s*<\/p>/g, '$1');
+      html = html.replace(/<p><\/p>/g, '');
+      html = html.replace(/\n/g, '<br>');
 
-  result.innerText = "Generating...";
+      return `<div class="report-container">${html}</div>`;
+    }
 
-  const res = await fetch(API + "/generate-summary", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({session_id: id})
-  });
+    async function saveSession() {
+      const payload = {
+        project_name: document.getElementById("project_name").value,
+        stakeholder_name: document.getElementById("stakeholder_name").value,
+        session_date: document.getElementById("session_date").value,
+        process_overview: document.getElementById("process_overview").value,
+        data_sources: document.getElementById("data_sources").value,
+        data_flow: document.getElementById("data_flow").value,
+        business_logic: document.getElementById("business_logic").value,
+        outputs_kpis: document.getElementById("outputs_kpis").value,
+        pain_points: document.getElementById("pain_points").value,
+        validation_rules: document.getElementById("validation_rules").value,
+        adoption_concerns: document.getElementById("adoption_concerns").value
+      };
 
-  const data = await res.json();
+      try {
+        document.getElementById("result").innerText = "Saving session...";
 
-  result.innerHTML = formatSummary(data.summary);
-}
+        const res = await fetch(`${API}/sessions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-</script>
+        const data = await res.json();
+        document.getElementById("result").innerHTML = `<div class="report-container"><p>Saved ✔️</p><p><strong>Session ID:</strong> ${data.session_id || "-"}</p></div>`;
 
+        await loadSessions();
+      } catch (error) {
+        document.getElementById("result").innerText = "Error saving session:\n" + error;
+      }
+    }
+
+    async function loadSessions() {
+      try {
+        document.getElementById("result").innerText = "Loading sessions...";
+
+        const res = await fetch(`${API}/sessions`, { method: "GET" });
+        const data = await res.json();
+
+        sessionsCache = data.items || [];
+
+        const select = document.getElementById("session_select");
+        select.innerHTML = '<option value="">Select a session</option>';
+
+        sessionsCache.forEach(s => {
+          const option = document.createElement("option");
+          option.value = s.session_id;
+          option.textContent = `${s.project_name || "No Project"} | ${s.stakeholder_name || "No Stakeholder"} | ${s.session_id}`;
+          select.appendChild(option);
+        });
+
+        resetSelectedSessionDetails();
+        document.getElementById("result").innerHTML = `<div class="report-container"><p>Loaded <strong>${sessionsCache.length}</strong> session(s) ✔️</p></div>`;
+      } catch (error) {
+        document.getElementById("result").innerText = "Error loading sessions:\n" + error;
+      }
+    }
+
+    async function viewStoredSummary() {
+      const id = document.getElementById("session_select").value;
+
+      if (!id) {
+        alert("Please select a session first.");
+        return;
+      }
+
+      try {
+        document.getElementById("result").innerText = "Loading stored summary...";
+
+        const res = await fetch(`${API}/sessions/${id}`, { method: "GET" });
+        const data = await res.json();
+
+        renderSelectedSessionDetails(data);
+
+        if (data.ai_deliverable) {
+          document.getElementById("result").innerHTML = formatSummary(data.ai_deliverable);
+        } else {
+          document.getElementById("result").innerHTML = `<div class="report-container"><p>No stored summary found for this session.</p></div>`;
+        }
+      } catch (error) {
+        document.getElementById("result").innerText = "Error loading stored summary:\n" + error;
+      }
+    }
+
+    async function generateSummary() {
+      const id = document.getElementById("session_select").value;
+
+      if (!id) {
+        alert("Please select a session first.");
+        return;
+      }
+
+      try {
+        document.getElementById("result").innerText = "Generating summary...";
+
+        const res = await fetch(`${API}/generate-summary`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: id })
+        });
+
+        const data = await res.json();
+
+        if (data.summary) {
+          document.getElementById("result").innerHTML = formatSummary(data.summary);
+        } else {
+          document.getElementById("result").innerHTML = `<div class="report-container"><p>${escapeHtml(JSON.stringify(data, null, 2))}</p></div>`;
+        }
+
+        const selected = sessionsCache.find(s => s.session_id === id);
+        if (selected) {
+          selected.status = "GENERATED";
+          renderSelectedSessionDetails(selected);
+        }
+      } catch (error) {
+        document.getElementById("result").innerText = "Error generating summary:\n" + error;
+      }
+    }
+
+    function downloadPdf() {
+      const selectedId = document.getElementById("session_select").value;
+      const project = document.getElementById("d_project").innerText || "Session Summary";
+      const stakeholder = document.getElementById("d_stakeholder").innerText || "-";
+      const date = document.getElementById("d_date").innerText || "-";
+      const status = document.getElementById("d_status").innerText || "-";
+      const sessionId = document.getElementById("d_id").innerText || "-";
+      const content = document.getElementById("result").innerHTML;
+
+      if (!selectedId) {
+        alert("Please select a session first.");
+        return;
+      }
+
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        alert("Popup blocked. Please allow popups for this site.");
+        return;
+      }
+
+      printWindow.document.write(`
+        <html>
+        <head>
+          <title>${project} - Summary</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 30px;
+              color: #222;
+              line-height: 1.6;
+            }
+            h1 {
+              margin-bottom: 6px;
+              font-size: 24px;
+            }
+            .meta {
+              margin-bottom: 24px;
+              padding: 14px;
+              background: #f8f9fb;
+              border: 1px solid #ddd;
+              border-radius: 8px;
+            }
+            .meta p {
+              margin: 4px 0;
+            }
+            .report-container h1 {
+              font-size: 22px;
+              margin-top: 0;
+            }
+            .report-container h2 {
+              margin-top: 20px;
+              border-bottom: 2px solid #ddd;
+              padding-bottom: 4px;
+            }
+            .report-container h3 {
+              margin-top: 16px;
+            }
+            .report-container h4 {
+              margin-top: 12px;
+            }
+            .report-container ul {
+              margin-left: 20px;
+            }
+            .report-container table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 12px;
+              margin-bottom: 12px;
+            }
+            .report-container th,
+            .report-container td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: left;
+              vertical-align: top;
+            }
+            .report-container th {
+              background: #f3f4f6;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Stakeholder Session Summary</h1>
+          <div class="meta">
+            <p><strong>Project:</strong> ${project}</p>
+            <p><strong>Stakeholder:</strong> ${stakeholder}</p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Status:</strong> ${status}</p>
+            <p><strong>Session ID:</strong> ${sessionId}</p>
+          </div>
+          ${content}
+        </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
+    }
+  </script>
 </body>
 </html>
