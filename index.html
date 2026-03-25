@@ -85,17 +85,6 @@
       border: 1px solid #c7d2fe;
     }
 
-    #result {
-      margin-top: 8px;
-      padding: 16px;
-      background: #f4f4f4;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      white-space: pre-wrap;
-      min-height: 160px;
-      overflow-x: auto;
-    }
-
     .helper {
       font-size: 13px;
       color: #666;
@@ -107,18 +96,18 @@
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
-    
+
     .detail-card {
       background: #f8fafc;
       border: 1px solid #dbe3ea;
       border-radius: 8px;
       padding: 14px;
     }
-    
+
     .detail-card.full {
       grid-column: 1 / -1;
     }
-    
+
     .result-panel {
       margin-top: 8px;
       padding: 18px;
@@ -129,19 +118,6 @@
       min-height: 220px;
       overflow-x: auto;
       line-height: 1.5;
-    }
-    
-    .result-panel h1,
-    .result-panel h2,
-    .result-panel h3 {
-      margin-top: 16px;
-      margin-bottom: 8px;
-    }
-    
-    .result-panel hr {
-      border: none;
-      border-top: 1px solid #ddd;
-      margin: 16px 0;
     }
   </style>
 </head>
@@ -189,7 +165,7 @@
       <button class="primary" type="button" onclick="saveSession()">Save Session</button>
     </div>
   </div>
-  
+
   <div class="section">
     <h2>2. Saved Sessions</h2>
 
@@ -229,38 +205,31 @@
     const API_BASE_URL = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
     let sessionsCache = [];
 
+    function resetSelectedSessionDetails() {
+      document.getElementById("detail_project").innerText = "-";
+      document.getElementById("detail_stakeholder").innerText = "-";
+      document.getElementById("detail_date").innerText = "-";
+      document.getElementById("detail_status").innerText = "-";
+      document.getElementById("detail_id").innerText = "-";
+    }
+
     function renderSelectedSessionDetails(session) {
-      document.getElementById("detail_project").innerText =
-        session.project_name || "-";
-    
-      document.getElementById("detail_stakeholder").innerText =
-        session.stakeholder_name || "-";
-    
-      document.getElementById("detail_date").innerText =
-        session.session_date || "-";
-    
-      document.getElementById("detail_status").innerText =
-        session.status || "-";
-    
-      document.getElementById("detail_id").innerText =
-        session.session_id || "-";
+      document.getElementById("detail_project").innerText = session.project_name || "-";
+      document.getElementById("detail_stakeholder").innerText = session.stakeholder_name || "-";
+      document.getElementById("detail_date").innerText = session.session_date || "-";
+      document.getElementById("detail_status").innerText = session.status || "-";
+      document.getElementById("detail_id").innerText = session.session_id || "-";
     }
 
     function handleSessionChange() {
       const sessionId = document.getElementById("session_select").value;
       const selected = sessionsCache.find(s => s.session_id === sessionId);
-    
+
       if (!selected) {
-        renderSelectedSessionDetails({
-          project_name: "-",
-          stakeholder_name: "-",
-          session_date: "-",
-          status: "-",
-          session_id: "-"
-        });
+        resetSelectedSessionDetails();
         return;
       }
-    
+
       renderSelectedSessionDetails(selected);
     }
 
@@ -292,52 +261,87 @@
 
         const result = await response.json();
         document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+
+        await loadSessions();
       } catch (error) {
         document.getElementById("result").innerText = "Error:\n" + error;
       }
     }
 
-    let sessionsCache = [];
-
     async function loadSessions() {
       try {
         document.getElementById("result").innerText = "Loading sessions...";
-    
-        const response = await fetch(`${API_BASE_URL}/sessions`);
+
+        const response = await fetch(`${API_BASE_URL}/sessions`, {
+          method: "GET"
+        });
+
         const result = await response.json();
-    
+
+        console.log("Loaded sessions response:", result);
+
         sessionsCache = result.items || [];
-    
+
         const select = document.getElementById("session_select");
         select.innerHTML = '<option value="">Select a session</option>';
-    
+
         sessionsCache.forEach(session => {
           const option = document.createElement("option");
           option.value = session.session_id;
-          option.textContent =
-            `${session.project_name || "No Project"} | ${session.stakeholder_name || "No Stakeholder"} | ${session.session_id}`;
+          option.textContent = `${session.project_name || "No Project"} | ${session.stakeholder_name || "No Stakeholder"} | ${session.session_id}`;
           select.appendChild(option);
         });
-    
+
+        resetSelectedSessionDetails();
+
         document.getElementById("result").innerText =
           `Loaded ${sessionsCache.length} session(s). Select one to continue.`;
       } catch (error) {
+        console.error("Load Sessions error:", error);
         document.getElementById("result").innerText =
-          "Error:\n" + error;
+          "Error loading sessions:\n" + error;
       }
     }
-    
-    async function generateSummary() {
+
+    async function viewStoredSummary() {
       const sessionId = document.getElementById("session_select").value;
-    
+
       if (!sessionId) {
         alert("Please select a session first");
         return;
       }
-    
+
+      try {
+        document.getElementById("result").innerText = "Loading stored summary...";
+
+        const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+          method: "GET"
+        });
+
+        const result = await response.json();
+
+        renderSelectedSessionDetails(result);
+
+        document.getElementById("result").innerText =
+          result.ai_deliverable || "No stored summary found for this session.";
+      } catch (error) {
+        console.error("View Stored Summary error:", error);
+        document.getElementById("result").innerText =
+          "Error:\n" + error;
+      }
+    }
+
+    async function generateSummary() {
+      const sessionId = document.getElementById("session_select").value;
+
+      if (!sessionId) {
+        alert("Please select a session first");
+        return;
+      }
+
       try {
         document.getElementById("result").innerText = "Generating summary...";
-    
+
         const response = await fetch(`${API_BASE_URL}/generate-summary`, {
           method: "POST",
           headers: {
@@ -347,42 +351,19 @@
             session_id: sessionId
           })
         });
-    
+
         const result = await response.json();
-    
+
         document.getElementById("result").innerText =
           result.summary || JSON.stringify(result, null, 2);
-    
+
         const selected = sessionsCache.find(s => s.session_id === sessionId);
         if (selected) {
           selected.status = "GENERATED";
           renderSelectedSessionDetails(selected);
         }
       } catch (error) {
-        document.getElementById("result").innerText =
-          "Error:\n" + error;
-      }
-    }
-
-    async function viewStoredSummary() {
-      const sessionId = document.getElementById("session_select").value;
-    
-      if (!sessionId) {
-        alert("Please select a session first");
-        return;
-      }
-    
-      try {
-        document.getElementById("result").innerText = "Loading stored summary...";
-    
-        const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`);
-        const result = await response.json();
-    
-        renderSelectedSessionDetails(result);
-    
-        document.getElementById("result").innerText =
-          result.ai_deliverable || "No stored summary found for this session.";
-      } catch (error) {
+        console.error("Generate Summary error:", error);
         document.getElementById("result").innerText =
           "Error:\n" + error;
       }
