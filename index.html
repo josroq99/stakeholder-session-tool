@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Stakeholder Session Tool</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,7 +35,6 @@
     .section h2 {
       margin-top: 0;
       margin-bottom: 16px;
-      font-size: 20px;
     }
 
     label {
@@ -55,7 +55,6 @@
 
     textarea {
       min-height: 90px;
-      resize: vertical;
     }
 
     .button-row {
@@ -69,11 +68,6 @@
       grid-template-columns: 1fr;
     }
 
-    button {
-      cursor: pointer;
-      background: #f3f4f6;
-    }
-
     button.primary {
       background: #1f6feb;
       color: white;
@@ -82,13 +76,6 @@
 
     button.secondary {
       background: #eef2ff;
-      border: 1px solid #c7d2fe;
-    }
-
-    .helper {
-      font-size: 13px;
-      color: #666;
-      margin-top: 6px;
     }
 
     .details-grid {
@@ -109,265 +96,224 @@
     }
 
     .result-panel {
-      margin-top: 8px;
       padding: 18px;
       background: #fbfbfc;
       border: 1px solid #ddd;
       border-radius: 8px;
-      white-space: pre-wrap;
       min-height: 220px;
-      overflow-x: auto;
-      line-height: 1.5;
+      line-height: 1.6;
+    }
+
+    .result-panel h2 {
+      margin-top: 18px;
+      color: #1f2937;
+    }
+
+    .result-panel h3 {
+      margin-top: 14px;
+      color: #374151;
+    }
+
+    .result-panel ul {
+      margin-left: 20px;
+    }
+
+    .result-panel li {
+      margin-bottom: 6px;
     }
   </style>
 </head>
+
 <body>
-  <h1>Stakeholder Session Tool</h1>
-  <div class="subtitle">Capture discovery sessions, manage saved sessions, and generate AI summaries.</div>
 
-  <div class="section">
-    <h2>1. New Session</h2>
+<h1>Stakeholder Session Tool</h1>
+<div class="subtitle">Capture discovery sessions and generate AI summaries.</div>
 
-    <label for="project_name">Project Name</label>
-    <input type="text" id="project_name" />
+<!-- 1. NEW SESSION -->
+<div class="section">
+  <h2>1. New Session</h2>
 
-    <label for="stakeholder_name">Stakeholder Name</label>
-    <input type="text" id="stakeholder_name" />
+  <label>Project Name</label>
+  <input id="project_name">
 
-    <label for="session_date">Session Date</label>
-    <input type="date" id="session_date" />
+  <label>Stakeholder Name</label>
+  <input id="stakeholder_name">
 
-    <label for="process_overview">Process Overview</label>
-    <textarea id="process_overview"></textarea>
+  <label>Session Date</label>
+  <input type="date" id="session_date">
 
-    <label for="data_sources">Data Sources</label>
-    <textarea id="data_sources"></textarea>
+  <label>Process Overview</label>
+  <textarea id="process_overview"></textarea>
 
-    <label for="data_flow">Data Flow</label>
-    <textarea id="data_flow"></textarea>
+  <label>Data Sources</label>
+  <textarea id="data_sources"></textarea>
 
-    <label for="business_logic">Business Logic</label>
-    <textarea id="business_logic"></textarea>
+  <label>Data Flow</label>
+  <textarea id="data_flow"></textarea>
 
-    <label for="outputs_kpis">Outputs / KPIs</label>
-    <textarea id="outputs_kpis"></textarea>
+  <label>Business Logic</label>
+  <textarea id="business_logic"></textarea>
 
-    <label for="pain_points">Pain Points</label>
-    <textarea id="pain_points"></textarea>
+  <label>Outputs / KPIs</label>
+  <textarea id="outputs_kpis"></textarea>
 
-    <label for="validation_rules">Validation / Trust</label>
-    <textarea id="validation_rules"></textarea>
+  <label>Pain Points</label>
+  <textarea id="pain_points"></textarea>
 
-    <label for="adoption_concerns">Adoption / Change Concerns</label>
-    <textarea id="adoption_concerns"></textarea>
+  <label>Validation</label>
+  <textarea id="validation_rules"></textarea>
 
-    <div class="button-row single">
-      <button class="primary" type="button" onclick="saveSession()">Save Session</button>
-    </div>
+  <label>Adoption Concerns</label>
+  <textarea id="adoption_concerns"></textarea>
+
+  <div class="button-row single">
+    <button class="primary" onclick="saveSession()">Save Session</button>
   </div>
+</div>
 
-  <div class="section">
-    <h2>2. Saved Sessions</h2>
+<!-- 2. SAVED -->
+<div class="section">
+  <h2>2. Saved Sessions</h2>
 
-    <div class="button-row single">
-      <button class="secondary" type="button" onclick="loadSessions()">Load Sessions</button>
-    </div>
+  <button class="secondary" onclick="loadSessions()">Load Sessions</button>
 
-    <label for="session_select">Choose a Saved Session</label>
-    <select id="session_select" onchange="handleSessionChange()">
-      <option value="">Select a session</option>
-    </select>
-    <div class="helper">Load sessions first, then choose one to view or summarize.</div>
+  <label>Choose Session</label>
+  <select id="session_select" onchange="handleSessionChange()">
+    <option value="">Select</option>
+  </select>
 
-    <div class="button-row">
-      <button type="button" onclick="viewStoredSummary()">View Stored Summary</button>
-      <button class="primary" type="button" onclick="generateSummary()">Generate Summary</button>
-    </div>
+  <div class="button-row">
+    <button onclick="viewStoredSummary()">View Stored</button>
+    <button class="primary" onclick="generateSummary()">Generate</button>
   </div>
+</div>
 
-  <div class="section">
-    <h2>3. Selected Session</h2>
-    <div id="session_details" class="details-grid">
-      <div class="detail-card"><strong>Project:</strong><br><span id="detail_project">-</span></div>
-      <div class="detail-card"><strong>Stakeholder:</strong><br><span id="detail_stakeholder">-</span></div>
-      <div class="detail-card"><strong>Date:</strong><br><span id="detail_date">-</span></div>
-      <div class="detail-card"><strong>Status:</strong><br><span id="detail_status">-</span></div>
-      <div class="detail-card full"><strong>Session ID:</strong><br><span id="detail_id">-</span></div>
-    </div>
+<!-- 3. DETAILS -->
+<div class="section">
+  <h2>3. Selected Session</h2>
+  <div class="details-grid">
+    <div class="detail-card"><b>Project</b><br><span id="d_project">-</span></div>
+    <div class="detail-card"><b>Stakeholder</b><br><span id="d_stakeholder">-</span></div>
+    <div class="detail-card"><b>Date</b><br><span id="d_date">-</span></div>
+    <div class="detail-card"><b>Status</b><br><span id="d_status">-</span></div>
+    <div class="detail-card full"><b>ID</b><br><span id="d_id">-</span></div>
   </div>
+</div>
 
-  <div class="section">
-    <h2>4. AI Output</h2>
-    <div id="result" class="result-panel">No session submitted yet.</div>
-  </div>
+<!-- 4 OUTPUT -->
+<div class="section">
+  <h2>4. AI Output</h2>
+  <div id="result" class="result-panel">Ready</div>
+</div>
 
-  <script>
-    const API_BASE_URL = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
-    let sessionsCache = [];
+<script>
 
-    function resetSelectedSessionDetails() {
-      document.getElementById("detail_project").innerText = "-";
-      document.getElementById("detail_stakeholder").innerText = "-";
-      document.getElementById("detail_date").innerText = "-";
-      document.getElementById("detail_status").innerText = "-";
-      document.getElementById("detail_id").innerText = "-";
-    }
+const API = "https://wnv34myjrb.execute-api.us-east-2.amazonaws.com";
+let sessionsCache = [];
 
-    function renderSelectedSessionDetails(session) {
-      document.getElementById("detail_project").innerText = session.project_name || "-";
-      document.getElementById("detail_stakeholder").innerText = session.stakeholder_name || "-";
-      document.getElementById("detail_date").innerText = session.session_date || "-";
-      document.getElementById("detail_status").innerText = session.status || "-";
-      document.getElementById("detail_id").innerText = session.session_id || "-";
-    }
+/* FORMAT SUMMARY */
+function formatSummary(text) {
+  if (!text) return "No summary available.";
 
-    function handleSessionChange() {
-      const sessionId = document.getElementById("session_select").value;
-      const selected = sessionsCache.find(s => s.session_id === sessionId);
+  let html = text;
 
-      if (!selected) {
-        resetSelectedSessionDetails();
-        return;
-      }
+  html = html.replace(/^# (.*$)/gim, '<h2>$1</h2>');
+  html = html.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+  html = html.replace(/^- (.*$)/gim, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
+  html = html.replace(/\n/g, '<br>');
 
-      renderSelectedSessionDetails(selected);
-    }
+  return html;
+}
 
-    async function saveSession() {
-      const payload = {
-        project_name: document.getElementById("project_name").value,
-        stakeholder_name: document.getElementById("stakeholder_name").value,
-        session_date: document.getElementById("session_date").value,
-        process_overview: document.getElementById("process_overview").value,
-        data_sources: document.getElementById("data_sources").value,
-        data_flow: document.getElementById("data_flow").value,
-        business_logic: document.getElementById("business_logic").value,
-        outputs_kpis: document.getElementById("outputs_kpis").value,
-        pain_points: document.getElementById("pain_points").value,
-        validation_rules: document.getElementById("validation_rules").value,
-        adoption_concerns: document.getElementById("adoption_concerns").value
-      };
+/* SAVE */
+async function saveSession() {
+  const payload = {
+    project_name: project_name.value,
+    stakeholder_name: stakeholder_name.value,
+    session_date: session_date.value,
+    process_overview: process_overview.value,
+    data_sources: data_sources.value,
+    data_flow: data_flow.value,
+    business_logic: business_logic.value,
+    outputs_kpis: outputs_kpis.value,
+    pain_points: pain_points.value,
+    validation_rules: validation_rules.value,
+    adoption_concerns: adoption_concerns.value
+  };
 
-      try {
-        document.getElementById("result").innerText = "Saving session...";
+  const res = await fetch(API + "/sessions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-        const response = await fetch(`${API_BASE_URL}/sessions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
+  result.innerText = "Saved ✔️";
+  loadSessions();
+}
 
-        const result = await response.json();
-        document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+/* LOAD */
+async function loadSessions() {
+  const res = await fetch(API + "/sessions");
+  const data = await res.json();
 
-        await loadSessions();
-      } catch (error) {
-        document.getElementById("result").innerText = "Error:\n" + error;
-      }
-    }
+  sessionsCache = data.items || [];
 
-    async function loadSessions() {
-      try {
-        document.getElementById("result").innerText = "Loading sessions...";
+  const select = document.getElementById("session_select");
+  select.innerHTML = '<option>Select</option>';
 
-        const response = await fetch(`${API_BASE_URL}/sessions`, {
-          method: "GET"
-        });
+  sessionsCache.forEach(s => {
+    const o = document.createElement("option");
+    o.value = s.session_id;
+    o.textContent = `${s.project_name || "No Project"} | ${s.session_id}`;
+    select.appendChild(o);
+  });
 
-        const result = await response.json();
+  result.innerText = "Sessions loaded ✔️";
+}
 
-        console.log("Loaded sessions response:", result);
+/* SELECT */
+function handleSessionChange() {
+  const id = session_select.value;
+  const s = sessionsCache.find(x => x.session_id === id);
 
-        sessionsCache = result.items || [];
+  if (!s) return;
 
-        const select = document.getElementById("session_select");
-        select.innerHTML = '<option value="">Select a session</option>';
+  d_project.innerText = s.project_name || "-";
+  d_stakeholder.innerText = s.stakeholder_name || "-";
+  d_date.innerText = s.session_date || "-";
+  d_status.innerText = s.status || "-";
+  d_id.innerText = s.session_id;
+}
 
-        sessionsCache.forEach(session => {
-          const option = document.createElement("option");
-          option.value = session.session_id;
-          option.textContent = `${session.project_name || "No Project"} | ${session.stakeholder_name || "No Stakeholder"} | ${session.session_id}`;
-          select.appendChild(option);
-        });
+/* VIEW */
+async function viewStoredSummary() {
+  const id = session_select.value;
 
-        resetSelectedSessionDetails();
+  const res = await fetch(API + "/sessions/" + id);
+  const data = await res.json();
 
-        document.getElementById("result").innerText =
-          `Loaded ${sessionsCache.length} session(s). Select one to continue.`;
-      } catch (error) {
-        console.error("Load Sessions error:", error);
-        document.getElementById("result").innerText =
-          "Error loading sessions:\n" + error;
-      }
-    }
+  result.innerHTML = formatSummary(data.ai_deliverable);
+}
 
-    async function viewStoredSummary() {
-      const sessionId = document.getElementById("session_select").value;
+/* GENERATE */
+async function generateSummary() {
+  const id = session_select.value;
 
-      if (!sessionId) {
-        alert("Please select a session first");
-        return;
-      }
+  result.innerText = "Generating...";
 
-      try {
-        document.getElementById("result").innerText = "Loading stored summary...";
+  const res = await fetch(API + "/generate-summary", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: id })
+  });
 
-        const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
-          method: "GET"
-        });
+  const data = await res.json();
 
-        const result = await response.json();
+  result.innerHTML = formatSummary(data.summary);
+}
 
-        renderSelectedSessionDetails(result);
+</script>
 
-        document.getElementById("result").innerText =
-          result.ai_deliverable || "No stored summary found for this session.";
-      } catch (error) {
-        console.error("View Stored Summary error:", error);
-        document.getElementById("result").innerText =
-          "Error:\n" + error;
-      }
-    }
-
-    async function generateSummary() {
-      const sessionId = document.getElementById("session_select").value;
-
-      if (!sessionId) {
-        alert("Please select a session first");
-        return;
-      }
-
-      try {
-        document.getElementById("result").innerText = "Generating summary...";
-
-        const response = await fetch(`${API_BASE_URL}/generate-summary`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            session_id: sessionId
-          })
-        });
-
-        const result = await response.json();
-
-        document.getElementById("result").innerText =
-          result.summary || JSON.stringify(result, null, 2);
-
-        const selected = sessionsCache.find(s => s.session_id === sessionId);
-        if (selected) {
-          selected.status = "GENERATED";
-          renderSelectedSessionDetails(selected);
-        }
-      } catch (error) {
-        console.error("Generate Summary error:", error);
-        document.getElementById("result").innerText =
-          "Error:\n" + error;
-      }
-    }
-  </script>
 </body>
 </html>
