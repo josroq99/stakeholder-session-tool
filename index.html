@@ -82,9 +82,11 @@
   <select id="session_select">
     <option value="">Select a session</option>
   </select>
+  
   <button type="button" onclick="saveSession()">Save Session</button>
   <button type="button" onclick="loadSessions()">Load Sessions</button>
   <button type="button" onclick="generateSummary()">Generate Summary</button>
+  <button type="button" onclick="viewStoredSummary()">View Stored Summary</button>
 
   <div id="result">No session submitted yet.</div>
 
@@ -175,6 +177,26 @@
     document.getElementById("result").innerText =
       result.summary || JSON.stringify(result, null, 2);
 
+  } catch (error) {
+    document.getElementById("result").innerText =
+      "Error:\n" + error;
+  }
+}
+
+async function viewStoredSummary() {
+  const sessionId = document.getElementById("session_select").value;
+
+  if (!sessionId) {
+    alert("Please select a session first");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`);
+    const result = await response.json();
+
+    document.getElementById("result").innerText =
+      result.ai_deliverable || "No stored summary found for this session.";
   } catch (error) {
     document.getElementById("result").innerText =
       "Error:\n" + error;
