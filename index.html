@@ -79,6 +79,7 @@
   <textarea id="adoption_concerns"></textarea>
 
   <button onclick="saveSession()">Save Session</button>
+  <button onclick="loadSessions()">Load Sessions</button>
 
   <div id="result">No session submitted yet.</div>
 
@@ -99,6 +100,16 @@
         validation_rules: document.getElementById("validation_rules").value,
         adoption_concerns: document.getElementById("adoption_concerns").value
       };
+
+      async function loadSessions() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/sessions`);
+          const result = await response.json();
+          document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+        } catch (error) {
+          document.getElementById("result").innerText = "Error:\n" + error;
+        }
+      }
 
       try {
         const response = await fetch(`${API_BASE_URL}/sessions`, {
