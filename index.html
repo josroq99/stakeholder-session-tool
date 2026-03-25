@@ -78,6 +78,10 @@
   <label for="adoption_concerns">Adoption / Change Concerns</label>
   <textarea id="adoption_concerns"></textarea>
 
+  <label for="session_select">Saved Sessions</label>
+  <select id="session_select">
+    <option value="">Select a session</option>
+  </select>
   <button type="button" onclick="saveSession()">Save Session</button>
   <button type="button" onclick="loadSessions()">Load Sessions</button>
   <button type="button" onclick="generateSummary()">Generate Summary</button>
@@ -127,6 +131,16 @@
   
       sessionsCache = result.items || [];
   
+      const select = document.getElementById("session_select");
+      select.innerHTML = '<option value="">Select a session</option>';
+  
+      sessionsCache.forEach(session => {
+        const option = document.createElement("option");
+        option.value = session.session_id;
+        option.textContent = `${session.project_name || "No Project"} | ${session.session_id}`;
+        select.appendChild(option);
+      });
+  
       document.getElementById("result").innerText =
         JSON.stringify(result, null, 2);
     } catch (error) {
@@ -136,12 +150,12 @@
   }
 
   async function generateSummary() {
-  if (sessionsCache.length === 0) {
-    alert("Load sessions first");
+  const sessionId = document.getElementById("session_select").value;
+
+  if (!sessionId) {
+    alert("Please select a session first");
     return;
   }
-
-  const sessionId = sessionsCache[0].session_id; // usamos el primero por ahora
 
   try {
     document.getElementById("result").innerText = "Generating summary...";
